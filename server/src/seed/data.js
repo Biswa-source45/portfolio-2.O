@@ -1,6 +1,7 @@
 // Content taken from the original static portfolio (Biswa-source45/portfolio-2.O).
 export const profile = {
   name: 'Biswabhusan Sahoo',
+  nickname: 'Biswa',
   role: 'Full-Stack Developer',
   headline:
     'Full-stack developer building production Generative & Agentic AI systems: real-time voice agents, RAG pipelines, LLM document automation, and the products around them.',

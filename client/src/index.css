@@ -202,20 +202,23 @@ html[data-theme-switching]::view-transition-new(root) {
   animation: theme-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
+@keyframes label-in {
+  from {
+    opacity: 0;
+    transform: translate(8px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
 @keyframes flicker {
   from {
     transform: scale(0.9, 0.85);
   }
   to {
     transform: scale(1.06, 1.15);
-  }
-}
-
-@media (pointer: fine) {
-  .has-cursor,
-  .has-cursor a,
-  .has-cursor button {
-    cursor: none;
   }
 }
 

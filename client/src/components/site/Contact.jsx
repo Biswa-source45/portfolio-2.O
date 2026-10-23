@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, ArrowUpRight, CheckCircle, EnvelopeSimple, GithubLogo, LinkedinLogo, PaperPlaneTilt, SpinnerGap } from '@phosphor-icons/react';
 import { api } from '../../lib/api.js';
+import { gsap, useGSAP, prefersReducedMotion } from '../../lib/motion.js';
 import { useScrollTo } from './scroll.js';
 import Magnetic from './Magnetic.jsx';
 import SectionHead from './SectionHead.jsx';
@@ -92,6 +93,42 @@ function Footer({ profile }) {
   );
 }
 
+// Oversized, faded short name closing the page; letters rise in as it scrolls into view.
+function BigName({ text }) {
+  const root = useRef(null);
+  const letters = [...text.toUpperCase()];
+  // Sized from the letter count so any name spans the content width.
+  const em = letters.length * 0.68;
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return;
+      gsap.from('.bn-char', {
+        yPercent: 100,
+        ease: 'none',
+        stagger: 0.08,
+        scrollTrigger: { trigger: root.current, start: 'top bottom', end: 'bottom bottom', scrub: 0.6 },
+      });
+    },
+    { scope: root }
+  );
+
+  return (
+    <div
+      ref={root}
+      aria-hidden="true"
+      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden font-display font-extrabold uppercase leading-[0.8] tracking-[-0.06em] text-ink/[0.07]"
+      style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
+    >
+      {letters.map((c, i) => (
+        <span key={i} className="bn-char inline-block pb-[0.04em]">
+          {c}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Contact({ profile }) {
   const links = [
     { label: 'Email', value: profile.email, href: `mailto:${profile.email}`, Icon: EnvelopeSimple },
@@ -138,6 +175,7 @@ export default function Contact({ profile }) {
         </div>
 
         <Footer profile={profile} />
+        <BigName text={profile.nickname || profile.name.split(' ')[0]} />
       </div>
     </section>
   );

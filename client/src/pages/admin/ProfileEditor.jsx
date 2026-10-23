@@ -10,6 +10,7 @@ const SECTIONS = [
     title: 'Basics',
     fields: [
       { key: 'name', label: 'Full name', wide: false },
+      { key: 'nickname', label: 'Short name', wide: false, hint: 'The big faded word at the bottom of the site.' },
       { key: 'role', label: 'Role', wide: false },
       { key: 'headline', label: 'Hero headline', type: 'textarea', rows: 3 },
       { key: 'about', label: 'About paragraph', type: 'textarea', rows: 5 },

@@ -14,6 +14,8 @@ export async function seedIfEmpty({ force = false } = {}) {
     await Achievement.insertMany(data.achievements);
     console.log('[seed] portfolio content created');
   }
+  // Fields added after launch get their defaults on existing databases.
+  await Profile.updateMany({ nickname: { $exists: false } }, { $set: { nickname: data.profile.nickname } });
 }
 
 export async function ensureAdmin() {

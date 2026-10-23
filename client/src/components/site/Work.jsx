@@ -17,7 +17,7 @@ const CHIP_SPOTS = [
 function ProjectVisual({ project, index }) {
   const initials = project.title.split(/\s|-/).filter(Boolean).map((w) => w[0]).join('').slice(0, 3);
   return (
-    <motion.div initial="rest" whileHover="hover" animate="rest" className="relative h-full w-full overflow-hidden bg-ink text-bg" data-cursor="View">
+    <motion.div initial="rest" whileHover="hover" animate="rest" className="relative h-full w-full overflow-hidden bg-ink text-bg">
       <div
         className="absolute inset-0 opacity-[0.12]"
         style={{ backgroundImage: 'linear-gradient(var(--bg) 1px, transparent 1px), linear-gradient(90deg, var(--bg) 1px, transparent 1px)', backgroundSize: '44px 44px' }}
@@ -48,7 +48,7 @@ function ProjectVisual({ project, index }) {
 
 function ProjectCard({ project, index, total }) {
   return (
-    <article className="work-card flex w-full shrink-0 flex-col gap-8 rounded-[28px] border border-line bg-surface p-5 sm:p-7 lg:h-[72vh] lg:w-[78vw] lg:max-w-[1150px] lg:flex-row">
+    <article className="work-card relative flex w-full origin-top flex-col gap-8 overflow-hidden rounded-[28px] border border-line bg-surface p-5 shadow-[0_-18px_50px_-30px_rgb(0_0_0/0.25)] will-change-transform sm:p-7 lg:h-[min(72vh,640px)] lg:flex-row">
       <div className="flex flex-col justify-between lg:w-[42%]">
         <div>
           <div className="wc-part flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted">
@@ -90,11 +90,13 @@ function ProjectCard({ project, index, total }) {
       </div>
       <div className="wc-visual aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto lg:flex-1">
         {project.image ? (
-          <img src={project.image} alt={`${project.title} preview`} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" data-cursor="View" />
+          <img src={project.image} alt={`${project.title} preview`} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
         ) : (
           <ProjectVisual project={project} index={index} />
         )}
       </div>
+      {/* Fades the card into the page background as the next card stacks over it. */}
+      <div className="wc-shade pointer-events-none absolute inset-0 bg-bg opacity-0" />
     </article>
   );
 }
@@ -111,47 +113,36 @@ function cascade(card, scrollTrigger, x, y) {
   return tl;
 }
 
+// Sticky offsets: each card parks a little lower than the one before it.
+const STACK_TOP = 104;
+const STACK_STEP = 26;
+
 export default function Work({ projects = [] }) {
   const root = useRef(null);
-  const track = useRef(null);
 
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
+      const slots = gsap.utils.toArray('.work-slot');
       const mm = gsap.matchMedia();
-      // Desktop: pin the section and scroll the cards sideways.
-      mm.add('(min-width: 1024px)', () => {
-        const distance = () => track.current.scrollWidth - window.innerWidth + 48;
-        const tween = gsap.to(track.current, {
-          x: () => -distance(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: '.work-pin',
-            start: 'top top',
-            end: () => `+=${distance()}`,
-            pin: true,
-            scrub: 0.8,
-            invalidateOnRefresh: true,
-          },
-        });
-        gsap.to('.work-progress', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '.work-pin', start: 'top top', end: () => `+=${distance()}`, scrub: true } });
-        gsap.utils.toArray('.work-card').forEach((card, i) => {
-          // Card swings in from the right as the track scrolls…
-          gsap.fromTo(
-            card,
-            { xPercent: 18, rotateY: -14, scale: 0.9, opacity: 0.35, transformPerspective: 1400, transformOrigin: 'left center' },
-            { xPercent: 0, rotateY: 0, scale: 1, opacity: 1, ease: 'power2.out', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 105%', end: 'left 45%', scrub: true } }
-          );
-          // …then its contents cascade in one after another. The first card is
-          // already in view when the section pins, so it plays on vertical scroll.
-          const trigger = i === 0 ? { trigger: '.work-pin', start: 'top 65%' } : { trigger: card, containerAnimation: tween, start: 'left 80%' };
-          cascade(card, { ...trigger, toggleActions: 'play none none reverse' }, 120, 0);
+      // Desktop: cards stick and stack; each one shrinks and dims as the next slides over it.
+      mm.add('(min-width: 768px)', () => {
+        slots.forEach((slot, i) => {
+          const card = slot.querySelector('.work-card');
+          cascade(card, { trigger: slot, start: 'top 78%' }, 0, 40);
+          const next = slots[i + 1];
+          if (!next) return;
+          // Only transform and opacity animate here so the scrub stays on the GPU.
+          const depth = slots.length - 1 - i;
+          const stackIn = { trigger: next, start: 'top bottom', end: `top ${STACK_TOP + (i + 1) * STACK_STEP}px`, scrub: 0.4 };
+          gsap.to(card, { scale: 1 - 0.04 * depth, ease: 'none', scrollTrigger: { ...stackIn } });
+          gsap.to(card.querySelector('.wc-shade'), { opacity: 0.45, ease: 'none', scrollTrigger: { ...stackIn } });
         });
       });
-      mm.add('(max-width: 1023px)', () => {
-        gsap.utils.toArray('.work-card').forEach((card) => {
-          gsap.from(card, { y: 70, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } });
-          cascade(card, { trigger: card, start: 'top 80%' }, 0, 36);
+      mm.add('(max-width: 767px)', () => {
+        slots.forEach((slot) => {
+          gsap.from(slot, { y: 70, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: slot, start: 'top 88%' } });
+          cascade(slot.querySelector('.work-card'), { trigger: slot, start: 'top 80%' }, 0, 36);
         });
       });
     },
@@ -161,18 +152,19 @@ export default function Work({ projects = [] }) {
   if (!projects.length) return null;
 
   return (
-    <section id="work" ref={root} className="py-28 md:py-40">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <section id="work" ref={root} className="px-4 py-28 sm:px-6 md:py-40">
+      <div className="mx-auto max-w-7xl">
         <SectionHead index="03" label="Selected work" lines={["Things I've", 'built & shipped.']} />
-      </div>
-      <div className="work-pin mt-16 lg:mt-0 lg:flex lg:h-screen lg:flex-col lg:justify-center lg:overflow-hidden">
-        <div ref={track} className="flex flex-col gap-6 px-4 sm:px-6 lg:w-max lg:flex-row lg:pl-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))]">
+        <div className="mt-16 md:mt-20">
           {projects.map((p, i) => (
-            <ProjectCard key={p._id} project={p} index={i} total={projects.length} />
+            <div
+              key={p._id}
+              className="work-slot mb-8 last:mb-0 md:sticky md:mb-[18vh] md:last:mb-0"
+              style={{ top: STACK_TOP + i * STACK_STEP }}
+            >
+              <ProjectCard project={p} index={i} total={projects.length} />
+            </div>
           ))}
-        </div>
-        <div className="mx-auto mt-8 hidden h-px w-full max-w-7xl bg-line px-6 lg:block">
-          <div className="work-progress h-px origin-left scale-x-0 bg-accent" />
         </div>
       </div>
     </section>
