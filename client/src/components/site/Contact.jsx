@@ -93,7 +93,8 @@ function Footer({ profile }) {
   );
 }
 
-// Oversized, faded short name closing the page; letters rise in as it scrolls into view.
+// Oversized short name closing the page: soft ink-to-transparent gradient
+// letters that rise and sharpen as they scroll in.
 function BigName({ text }) {
   const root = useRef(null);
   const letters = [...text.toUpperCase()];
@@ -105,6 +106,8 @@ function BigName({ text }) {
       if (prefersReducedMotion()) return;
       gsap.from('.bn-char', {
         yPercent: 100,
+        opacity: 0,
+        filter: 'blur(14px)',
         ease: 'none',
         stagger: 0.08,
         scrollTrigger: { trigger: root.current, start: 'top bottom', end: 'bottom bottom', scrub: 0.6 },
@@ -117,11 +120,18 @@ function BigName({ text }) {
     <div
       ref={root}
       aria-hidden="true"
-      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden font-display font-extrabold uppercase leading-[0.8] tracking-[-0.06em] text-ink/[0.07]"
+      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden font-display font-extrabold uppercase leading-[0.8] tracking-[-0.06em]"
       style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
     >
       {letters.map((c, i) => (
-        <span key={i} className="bn-char inline-block pb-[0.04em]">
+        <span
+          key={i}
+          className="bn-char inline-block bg-clip-text pb-[0.04em] text-transparent"
+          style={{
+            backgroundImage:
+              'linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, transparent) 0%, color-mix(in srgb, var(--ink) 6%, transparent) 55%, transparent 96%)',
+          }}
+        >
           {c}
         </span>
       ))}

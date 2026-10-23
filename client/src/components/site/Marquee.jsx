@@ -29,21 +29,31 @@ export default function Marquee({ items = [] }) {
   useGSAP(
     () => {
       if (prefersReducedMotion()) return;
-      const front = gsap.to('.mq-front', { xPercent: -50, duration: 45, ease: 'none', repeat: -1 });
-      const back = gsap.fromTo('.mq-back', { xPercent: -50 }, { xPercent: 0, duration: 55, ease: 'none', repeat: -1 });
+      // Positions are advanced by hand and wrapped into [-50%, 0%) every frame,
+      // so the loop never runs out in either direction (a reversed repeating
+      // tween stops when it reaches its start).
+      const wrap = gsap.utils.wrap(-50, 0);
+      const front = root.current.querySelector('.mq-front');
+      const back = root.current.querySelector('.mq-back');
+      const s = { front: 0, back: -25, dir: 1, speed: 1 };
+      const tick = (_time, deltaMs) => {
+        s.speed += (s.dir - s.speed) * 0.05; // boosts ease back to cruising speed
+        s.front = wrap(s.front - (50 / 45000) * deltaMs * s.speed);
+        s.back = wrap(s.back + (50 / 55000) * deltaMs * s.speed);
+        gsap.set(front, { xPercent: s.front });
+        gsap.set(back, { xPercent: s.back });
+      };
+      gsap.ticker.add(tick);
       ScrollTrigger.create({
         trigger: root.current,
         start: 'top bottom',
         end: 'bottom top',
         onUpdate: (self) => {
-          const boost = 1 + Math.min(Math.abs(self.getVelocity()) / 350, 5);
-          const dir = self.direction;
-          [front, back].forEach((loop) => {
-            gsap.to(loop, { timeScale: dir * boost, duration: 0.25, overwrite: true });
-            gsap.to(loop, { timeScale: dir, duration: 1.2, delay: 0.25 });
-          });
+          s.dir = self.direction;
+          s.speed = s.dir * (1 + Math.min(Math.abs(self.getVelocity()) / 350, 5));
         },
       });
+      return () => gsap.ticker.remove(tick);
     },
     { scope: root }
   );
