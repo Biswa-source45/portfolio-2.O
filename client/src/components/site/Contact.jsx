@@ -92,6 +92,33 @@ function Footer({ profile }) {
   );
 }
 
+// Oversized, faded short name closing the page. One text run (not a span per
+// letter) so the letters keep their natural spacing; the padding leaves room
+// for glyph overhang because background-clip: text only paints inside the box.
+function BigName({ text }) {
+  const word = text.toUpperCase();
+  // Sized from the letter count so any name spans the content width.
+  const em = word.length * 0.7;
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none mt-10 flex select-none justify-center pb-4 font-display font-extrabold leading-none"
+      style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
+    >
+      <span
+        className="bg-clip-text px-[0.08em] tracking-[-0.05em] text-transparent"
+        style={{
+          backgroundImage:
+            'linear-gradient(180deg, color-mix(in srgb, var(--ink) 16%, transparent) 15%, color-mix(in srgb, var(--ink) 7%, transparent) 60%, color-mix(in srgb, var(--ink) 3%, transparent) 85%)',
+        }}
+      >
+        {word}
+      </span>
+    </div>
+  );
+}
+
 export default function Contact({ profile }) {
   const links = [
     { label: 'Email', value: profile.email, href: `mailto:${profile.email}`, Icon: EnvelopeSimple },
@@ -138,6 +165,7 @@ export default function Contact({ profile }) {
         </div>
 
         <Footer profile={profile} />
+        <BigName text={profile.nickname || profile.name.split(' ')[0]} />
       </div>
     </section>
   );

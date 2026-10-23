@@ -4,7 +4,7 @@ import { api } from '../lib/api.js';
 import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '../lib/motion.js';
 import { ScrollContext } from '../components/site/scroll.js';
 import Loader from '../components/site/Loader.jsx';
-import Cursor from '../components/site/Cursor.jsx';
+import ThemedCursorTrail from '../components/site/ThemedCursorTrail.jsx';
 import Nav from '../components/site/Nav.jsx';
 import Hero from '../components/site/Hero.jsx';
 import Marquee from '../components/site/Marquee.jsx';
@@ -15,6 +15,7 @@ import Skills from '../components/site/Skills.jsx';
 import Recognition from '../components/site/Recognition.jsx';
 import Contact from '../components/site/Contact.jsx';
 import ChatWidget from '../components/site/ChatWidget.jsx';
+import ScrollRocket from '../components/site/ScrollRocket.jsx';
 
 export default function Home() {
   const [data, setData] = useState(null);
@@ -95,12 +96,13 @@ export default function Home() {
 
   return (
     <ScrollContext.Provider value={lenis}>
-      <div className="has-cursor grain" ref={main}>
+      <div className="grain" ref={main}>
         <Loader name={data?.profile.name} dataReady={Boolean(data)} onDone={() => setReady(true)} />
-        <Cursor />
+        <ThemedCursorTrail />
         {data && (
           <>
             <Nav profile={data.profile} />
+            <ScrollRocket />
             <main>
               <Hero profile={data.profile} ready={ready} />
               <Marquee items={data.profile.marquee} />

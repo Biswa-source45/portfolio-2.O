@@ -29,7 +29,7 @@ export function portfolioToText({ profile: p, projects, experience, skills, achi
   });
   lines.push('', '## Projects');
   projects.forEach((pr) => {
-    lines.push(`### ${pr.title} — ${pr.subtitle || ''} (${pr.category || ''})`, pr.description || '');
+    lines.push(`### ${pr.title}: ${pr.subtitle || ''} (${pr.category || ''})`, pr.description || '');
     if (pr.tags?.length) lines.push(`Stack: ${pr.tags.join(', ')}`);
     if (pr.liveUrl) lines.push(`Live: ${pr.liveUrl}`);
     if (pr.repoUrl) lines.push(`Code: ${pr.repoUrl}`);
@@ -38,7 +38,7 @@ export function portfolioToText({ profile: p, projects, experience, skills, achi
   lines.push('', '## Skills');
   skills.forEach((s) => lines.push(`- ${s.title}: ${s.items.join(', ')}`));
   lines.push('', '## Awards');
-  achievements.forEach((a) => lines.push(`- ${a.rank} — ${a.title}: ${a.description}`));
+  achievements.forEach((a) => lines.push(`- ${a.rank} place, ${a.title}: ${a.description}`));
   lines.push('', '## Education & certifications');
   p.education?.forEach((e) => lines.push(`- ${e.kind}: ${e.title}, ${e.place}`));
   if (p.languages?.length) lines.push(`Spoken languages: ${p.languages.join(', ')}`);

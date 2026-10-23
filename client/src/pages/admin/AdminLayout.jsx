@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Briefcase, ChatCircleDots, Code, List, Robot, SignOut, SquaresFour, Trophy, UserCircle, ArrowSquareOut, X, Moon, Sun } from '@phosphor-icons/react';
+import { Briefcase, ChatCircleDots, Code, List, Robot, SignOut, SquaresFour, Trophy, UserCircle, ArrowSquareOut, X } from '@phosphor-icons/react';
 import { api, token } from '../../lib/api.js';
-import { useTheme } from '../../lib/theme.js';
+import ThemePicker from '../../components/ThemePicker.jsx';
 import { ToastProvider } from '../../components/admin/toast.jsx';
 
 const NAV = [
@@ -18,7 +18,6 @@ const NAV = [
 ];
 
 function Sidebar({ email, onNavigate, onLogout }) {
-  const [theme, toggleTheme] = useTheme();
   return (
     <div className="flex h-full flex-col p-4">
       <div className="flex items-center gap-3 px-2 py-3">
@@ -46,9 +45,11 @@ function Sidebar({ email, onNavigate, onLogout }) {
         <a href="/" target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted hover:text-ink">
           <ArrowSquareOut size={18} /> View site
         </a>
-        <button type="button" onClick={toggleTheme} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted hover:text-ink">
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />} {theme === 'dark' ? 'Light' : 'Dark'} mode
-        </button>
+        <ThemePicker
+          placement="up"
+          label="Theme"
+          buttonClassName="relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted hover:text-ink"
+        />
         <button type="button" onClick={onLogout} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted hover:text-red-500">
           <SignOut size={18} /> Sign out
         </button>

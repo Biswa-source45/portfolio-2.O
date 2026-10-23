@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Biswabhusan Sahoo — Full-Stack & AI Developer</title>
+    <title>Biswabhusan Sahoo | Full-Stack & AI Developer</title>
     <meta name="description" content="Portfolio of Biswabhusan Sahoo, a full-stack developer building production Generative and Agentic AI systems." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +12,10 @@
     <script>
       try {
         var t = localStorage.getItem('theme');
-        if (t) document.documentElement.dataset.theme = t;
+        if (t) {
+          document.documentElement.dataset.theme = t;
+          document.documentElement.dataset.scheme = /^(dark|noir|matrix|grape)$/.test(t) ? 'dark' : 'light';
+        }
       } catch (e) {}
     </script>
   </head>

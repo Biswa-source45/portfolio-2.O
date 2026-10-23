@@ -78,7 +78,7 @@ export default function Hero({ profile, ready }) {
 
         <div className="mt-8 grid gap-8 md:grid-cols-12 md:items-end">
           {profile.photo && (
-            <figure className="hero-photo relative w-full max-w-sm overflow-hidden rounded-3xl border border-line bg-white md:col-span-4 lg:col-span-3" data-cursor="Hi!">
+            <figure className="hero-photo relative w-full max-w-sm overflow-hidden rounded-3xl border border-line bg-white md:col-span-4 lg:col-span-3">
               <img src={profile.photo} alt={`Portrait of ${profile.name}`} className="block h-auto w-full transition-transform duration-700 ease-out-expo hover:scale-[1.03]" />
               <figcaption className="absolute bottom-3 left-3 rounded-full bg-ink/80 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-bg backdrop-blur">
                 {profile.name}

@@ -34,7 +34,7 @@ const CONFIG = {
     fields: [
       { key: 'company', label: 'Company', wide: false },
       { key: 'role', label: 'Role', wide: false },
-      { key: 'period', label: 'Period', placeholder: 'May 2026 — Present', wide: false },
+      { key: 'period', label: 'Period', placeholder: 'May 2026 to Present', wide: false },
       { key: 'location', label: 'Location', wide: false },
       { key: 'current', label: 'Current role', type: 'checkbox', hint: 'Shows a "Current" badge.' },
       { key: 'highlights', label: 'Highlights', type: 'list', addLabel: 'Add highlight', fields: [{ key: 'title', label: 'Title' }, { key: 'text', label: 'Description', type: 'textarea' }] },
