@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
-import { List, Moon, Sun, X } from '@phosphor-icons/react';
-import { useTheme } from '../../lib/theme.js';
+import { List, X } from '@phosphor-icons/react';
+import ThemePicker from '../ThemePicker.jsx';
 import { useScrollTo } from './scroll.js';
 import Magnetic from './Magnetic.jsx';
 
@@ -14,7 +14,6 @@ const LINKS = [
 ];
 
 export default function Nav({ profile }) {
-  const [theme, toggleTheme] = useTheme();
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState('');
@@ -79,18 +78,7 @@ export default function Nav({ profile }) {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-              className="grid h-9 w-9 place-items-center rounded-full border border-line transition-colors hover:bg-ink hover:text-bg"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span key={theme} initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.25 }}>
-                  {theme === 'dark' ? <Sun size={16} weight="bold" /> : <Moon size={16} weight="bold" />}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+            <ThemePicker />
             <Magnetic className="hidden sm:inline-block">
               <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-bg transition-colors hover:bg-accent hover:text-accent-ink">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />

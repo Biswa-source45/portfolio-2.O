@@ -51,25 +51,25 @@ function ProjectCard({ project, index, total }) {
     <article className="work-card flex w-full shrink-0 flex-col gap-8 rounded-[28px] border border-line bg-surface p-5 sm:p-7 lg:h-[72vh] lg:w-[78vw] lg:max-w-[1150px] lg:flex-row">
       <div className="flex flex-col justify-between lg:w-[42%]">
         <div>
-          <div className="flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted">
+          <div className="wc-part flex items-center justify-between font-mono text-xs uppercase tracking-widest text-muted">
             <span>{project.category}</span>
             <span>
               {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
             </span>
           </div>
-          <h3 className="mt-8 font-display text-4xl font-bold leading-[0.95] tracking-tight md:text-5xl">{project.title}</h3>
-          <p className="mt-3 text-accent">{project.subtitle}</p>
-          <p className="mt-6 leading-relaxed text-muted">{project.description}</p>
+          <h3 className="wc-part mt-8 font-display text-4xl font-bold leading-[0.95] tracking-tight md:text-5xl">{project.title}</h3>
+          <p className="wc-part mt-3 text-accent">{project.subtitle}</p>
+          <p className="wc-part mt-6 leading-relaxed text-muted">{project.description}</p>
         </div>
         <div className="mt-8">
           <div className="flex flex-wrap gap-2">
             {project.tags?.map((t) => (
-              <span key={t} className="rounded-full border border-line px-3 py-1 font-mono text-[11px]">
+              <span key={t} className="wc-part rounded-full border border-line px-3 py-1 font-mono text-[11px]">
                 {t}
               </span>
             ))}
           </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="wc-part mt-6 flex flex-wrap items-center gap-3">
             {project.liveUrl && (
               <a href={project.liveUrl} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-bg">
                 Live site <ArrowUpRight size={14} weight="bold" className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -88,7 +88,7 @@ function ProjectCard({ project, index, total }) {
           </div>
         </div>
       </div>
-      <div className="aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto lg:flex-1">
+      <div className="wc-visual aspect-[4/3] overflow-hidden rounded-2xl lg:aspect-auto lg:flex-1">
         {project.image ? (
           <img src={project.image} alt={`${project.title} preview`} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" data-cursor="View" />
         ) : (
@@ -97,6 +97,18 @@ function ProjectCard({ project, index, total }) {
       </div>
     </article>
   );
+}
+
+// Text, tags and links slide in one by one, then the artwork wipes open.
+function cascade(card, scrollTrigger, x, y) {
+  const tl = gsap.timeline({ scrollTrigger });
+  tl.from(card.querySelectorAll('.wc-part'), { x, y, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.06 }).fromTo(
+    card.querySelector('.wc-visual'),
+    { clipPath: 'inset(0 0 0 100% round 16px)' },
+    { clipPath: 'inset(0 0 0 0% round 16px)', duration: 1.1, ease: 'expo.inOut' },
+    0.1
+  );
+  return tl;
 }
 
 export default function Work({ projects = [] }) {
@@ -123,12 +135,24 @@ export default function Work({ projects = [] }) {
           },
         });
         gsap.to('.work-progress', { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '.work-pin', start: 'top top', end: () => `+=${distance()}`, scrub: true } });
-        gsap.utils.toArray('.work-card').forEach((card) => {
-          gsap.from(card, { scale: 0.92, opacity: 0.4, ease: 'none', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 100%', end: 'left 55%', scrub: true } });
+        gsap.utils.toArray('.work-card').forEach((card, i) => {
+          // Card swings in from the right as the track scrolls…
+          gsap.fromTo(
+            card,
+            { xPercent: 18, rotateY: -14, scale: 0.9, opacity: 0.35, transformPerspective: 1400, transformOrigin: 'left center' },
+            { xPercent: 0, rotateY: 0, scale: 1, opacity: 1, ease: 'power2.out', scrollTrigger: { trigger: card, containerAnimation: tween, start: 'left 105%', end: 'left 45%', scrub: true } }
+          );
+          // …then its contents cascade in one after another. The first card is
+          // already in view when the section pins, so it plays on vertical scroll.
+          const trigger = i === 0 ? { trigger: '.work-pin', start: 'top 65%' } : { trigger: card, containerAnimation: tween, start: 'left 80%' };
+          cascade(card, { ...trigger, toggleActions: 'play none none reverse' }, 120, 0);
         });
       });
       mm.add('(max-width: 1023px)', () => {
-        gsap.utils.toArray('.work-card').forEach((card) => gsap.from(card, { y: 60, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } }));
+        gsap.utils.toArray('.work-card').forEach((card) => {
+          gsap.from(card, { y: 70, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: card, start: 'top 88%' } });
+          cascade(card, { trigger: card, start: 'top 80%' }, 0, 36);
+        });
       });
     },
     { scope: root, dependencies: [projects.length] }

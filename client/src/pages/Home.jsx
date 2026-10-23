@@ -15,6 +15,7 @@ import Skills from '../components/site/Skills.jsx';
 import Recognition from '../components/site/Recognition.jsx';
 import Contact from '../components/site/Contact.jsx';
 import ChatWidget from '../components/site/ChatWidget.jsx';
+import RocketTrail from '../components/site/RocketTrail.jsx';
 
 export default function Home() {
   const [data, setData] = useState(null);
@@ -101,7 +102,8 @@ export default function Home() {
         {data && (
           <>
             <Nav profile={data.profile} />
-            <main>
+            <main className="relative isolate">
+              <RocketTrail />
               <Hero profile={data.profile} ready={ready} />
               <Marquee items={data.profile.marquee} />
               <About profile={data.profile} />
