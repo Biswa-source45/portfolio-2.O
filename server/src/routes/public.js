@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { Message, Stat } from '../models/index.js';
+import { Message, Stat, Upload } from '../models/index.js';
 import { getPortfolio } from '../lib/portfolio.js';
 import { getAiConfig } from '../lib/aiConfig.js';
 
@@ -14,7 +14,14 @@ router.get('/portfolio', async (_req, res) => {
   res.json({ ...data, profile: { ...data.profile, ai: { ...ai, available: Boolean(ai.enabled && apiKey) } } });
 });
 
-router.get('/visits', async (_req, res) => {
+router.get('/uploads/:id', async (req, res) => {
+  const file = await Upload.findById(req.params.id).lean();
+  if (!file) return res.status(404).json({ error: 'Image not found' });
+  res.set({ 'Content-Type': file.contentType, 'Cache-Control': 'public, max-age=31536000, immutable' });
+  res.send(Buffer.from(file.data.buffer ?? file.data));
+});
+
+router.get('/visits',async (_req, res) => {
   const stat = await Stat.findOne({ key: 'views' }).lean();
   res.json({ views: stat?.count || 0 });
 });

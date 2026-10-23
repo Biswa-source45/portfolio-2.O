@@ -8,7 +8,7 @@ export const profile = {
     "I'm a full-stack developer building production Generative AI and Agentic AI systems — real-time voice agents, RAG pipelines and LLM-powered document automation. I'm full-stack too: React, Next.js and Node.js, shipping REST and WebSocket APIs, webhooks and secure web apps end to end.",
   location: 'Bhubaneswar, Odisha',
   email: 'biswabhusansahoo2005@gmail.com',
-  photo: '/uploads/photo.jpg',
+  photo: '/photo.jpg',
   availability: 'Open to AI engineering & full-stack roles',
   socials: {
     github: 'https://github.com/Biswa-source45',

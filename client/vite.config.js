@@ -10,7 +10,6 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': API_URL,
-      '/uploads': API_URL,
     },
   },
   build: { chunkSizeWarningLimit: 800 },
