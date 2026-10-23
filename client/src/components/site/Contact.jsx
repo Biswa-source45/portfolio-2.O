@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, ArrowUpRight, CheckCircle, EnvelopeSimple, GithubLogo, LinkedinLogo, PaperPlaneTilt, SpinnerGap } from '@phosphor-icons/react';
 import { api } from '../../lib/api.js';
-import { gsap, useGSAP, prefersReducedMotion } from '../../lib/motion.js';
 import { useScrollTo } from './scroll.js';
 import Magnetic from './Magnetic.jsx';
 import SectionHead from './SectionHead.jsx';
@@ -93,52 +92,29 @@ function Footer({ profile }) {
   );
 }
 
-// Oversized short name closing the page: soft ink-to-transparent gradient
-// letters that rise and sharpen as they scroll in.
+// Oversized, faded short name closing the page. One text run (not a span per
+// letter) so the letters keep their natural spacing; the padding leaves room
+// for glyph overhang because background-clip: text only paints inside the box.
 function BigName({ text }) {
-  const root = useRef(null);
-  const letters = [...text.toUpperCase()];
+  const word = text.toUpperCase();
   // Sized from the letter count so any name spans the content width.
-  const em = letters.length * 0.74;
-
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      gsap.from('.bn-char', {
-        yPercent: 100,
-        opacity: 0,
-        filter: 'blur(14px)',
-        duration: 1.3,
-        ease: 'expo.out',
-        stagger: 0.09,
-        // Plays once the name peeks in; tying it to scroll left the last letters
-        // half-risen because the page ends before the name is fully in view.
-        scrollTrigger: { trigger: root.current, start: 'top 95%', toggleActions: 'play none none reverse' },
-      });
-    },
-    { scope: root }
-  );
+  const em = word.length * 0.7;
 
   return (
     <div
-      ref={root}
       aria-hidden="true"
-      className="pointer-events-none mt-10 flex select-none justify-center overflow-x-visible overflow-y-clip pb-4 font-display font-extrabold uppercase leading-none"
+      className="pointer-events-none mt-10 flex select-none justify-center pb-4 font-display font-extrabold leading-none"
       style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
     >
-      {/* Padding keeps each glyph inside its own clipped background; negative margins tighten the spacing. */}
-      {letters.map((c, i) => (
-        <span
-          key={i}
-          className="bn-char -mx-[0.08em] inline-block bg-clip-text px-[0.05em] text-transparent"
-          style={{
-            backgroundImage:
-              'linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, transparent) 15%, color-mix(in srgb, var(--ink) 8%, transparent) 60%, color-mix(in srgb, var(--ink) 3%, transparent) 85%)',
-          }}
-        >
-          {c}
-        </span>
-      ))}
+      <span
+        className="bg-clip-text px-[0.08em] tracking-[-0.05em] text-transparent"
+        style={{
+          backgroundImage:
+            'linear-gradient(180deg, color-mix(in srgb, var(--ink) 16%, transparent) 15%, color-mix(in srgb, var(--ink) 7%, transparent) 60%, color-mix(in srgb, var(--ink) 3%, transparent) 85%)',
+        }}
+      >
+        {word}
+      </span>
     </div>
   );
 }
