@@ -7,8 +7,10 @@ function TechTile({ name }) {
   return (
     <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border-2 border-[var(--band-ink)] bg-[#fffaf2] shadow-[4px_4px_0_var(--band-ink)] md:h-14 md:w-14">
       {icon ? (
-        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 md:h-7 md:w-7" fill={`#${icon.hex}`}>
-          <path d={icon.path} />
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6 md:h-7 md:w-7">
+          {icon.map((p, i) => (
+            <path key={i} d={p.d} fill={p.fill || 'none'} stroke={p.stroke} strokeWidth={p.strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+          ))}
         </svg>
       ) : (
         <span className="font-display text-sm font-extrabold text-[#14110d] md:text-base">
