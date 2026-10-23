@@ -108,9 +108,12 @@ function BigName({ text }) {
         yPercent: 100,
         opacity: 0,
         filter: 'blur(14px)',
-        ease: 'none',
-        stagger: 0.08,
-        scrollTrigger: { trigger: root.current, start: 'top bottom', end: 'bottom bottom', scrub: 0.6 },
+        duration: 1.3,
+        ease: 'expo.out',
+        stagger: 0.09,
+        // Plays once the name peeks in; tying it to scroll left the last letters
+        // half-risen because the page ends before the name is fully in view.
+        scrollTrigger: { trigger: root.current, start: 'top 95%', toggleActions: 'play none none reverse' },
       });
     },
     { scope: root }
@@ -120,16 +123,16 @@ function BigName({ text }) {
     <div
       ref={root}
       aria-hidden="true"
-      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden font-display font-extrabold uppercase leading-[0.8] tracking-[-0.06em]"
+      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden pb-4 font-display font-extrabold uppercase leading-none tracking-[-0.06em]"
       style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
     >
       {letters.map((c, i) => (
         <span
           key={i}
-          className="bn-char inline-block bg-clip-text pb-[0.04em] text-transparent"
+          className="bn-char inline-block bg-clip-text text-transparent"
           style={{
             backgroundImage:
-              'linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, transparent) 0%, color-mix(in srgb, var(--ink) 6%, transparent) 55%, transparent 96%)',
+              'linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, transparent) 15%, color-mix(in srgb, var(--ink) 8%, transparent) 60%, color-mix(in srgb, var(--ink) 3%, transparent) 85%)',
           }}
         >
           {c}
