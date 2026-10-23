@@ -115,7 +115,19 @@ const settingSchema = new Schema(
   { timestamps: true }
 );
 
+// Images uploaded from the admin panel live in the database, so they survive
+// redeploys on hosts without a persistent disk (Vercel, Render free tier).
+const uploadSchema = new Schema(
+  {
+    data: { type: Buffer, required: true },
+    contentType: { type: String, required: true },
+    size: Number,
+  },
+  { timestamps: true }
+);
+
 export const Profile = model('Profile', profileSchema);
+export const Upload = model('Upload', uploadSchema);
 export const Setting = model('Setting', settingSchema);
 export const Project = model('Project', projectSchema);
 export const Experience = model('Experience', experienceSchema);

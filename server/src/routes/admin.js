@@ -1,10 +1,7 @@
-import crypto from 'node:crypto';
-import path from 'node:path';
 import { Router } from 'express';
 import multer from 'multer';
 import { requireAuth } from '../middleware/auth.js';
-import { Profile, Project, Experience, SkillGroup, Achievement, Message, Stat } from '../models/index.js';
-import { UPLOAD_DIR } from '../lib/paths.js';
+import { Profile, Project, Experience, SkillGroup, Achievement, Message, Stat, Upload } from '../models/index.js';
 import { getAiStatus, getAvailableModels, saveApiKey, removeApiKey, saveModel } from '../lib/aiConfig.js';
 
 const router = Router();
@@ -89,18 +86,17 @@ router.delete('/messages/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Vercel caps request bodies at 4.5 MB, so uploads stay under 4 MB.
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (_req, file, cb) => cb(null, `${crypto.randomUUID()}${path.extname(file.originalname).toLowerCase()}`),
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => cb(null, /^image\/(png|jpe?g|webp|gif|avif)$/.test(file.mimetype)),
 });
 
-router.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Upload a PNG, JPG, WebP, GIF or AVIF image under 5 MB' });
-  res.status(201).json({ url: `/uploads/${req.file.filename}` });
+router.post('/upload', upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Upload a PNG, JPG, WebP, GIF or AVIF image under 4 MB' });
+  const doc = await Upload.create({ data: req.file.buffer, contentType: req.file.mimetype, size: req.file.size });
+  res.status(201).json({ url: `/api/uploads/${doc._id}` });
 });
 
 export default router;

@@ -12,6 +12,10 @@ let localServer = null;
 export async function connectDB() {
   let uri = process.env.MONGO_URI;
 
+  if (!uri && process.env.VERCEL) {
+    throw new Error('MONGO_URI is not set. Add a MongoDB Atlas connection string in the Vercel project settings.');
+  }
+
   if (!uri) {
     const { MongoMemoryServer } = await import('mongodb-memory-server');
     const dbPath = path.resolve(here, '../../.mongo-data');
