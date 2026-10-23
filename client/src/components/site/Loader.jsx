@@ -3,48 +3,77 @@ import { gsap, prefersReducedMotion } from '../../lib/motion.js';
 
 const WORDS = ['Design', 'Engineer', 'Ship'];
 
+// Shortest time the intro stays up, so it reads as a beat rather than a flash.
+// Second visits in the same tab session get a quicker one.
+const MIN_FIRST = 0.6;
+const MIN_REPEAT = 0.15;
+
+// Read once per page load (not in an effect, which React may run twice in dev).
+const REPEAT_VISIT = (() => {
+  try {
+    const seen = sessionStorage.getItem('intro-seen') === '1';
+    sessionStorage.setItem('intro-seen', '1');
+    return seen;
+  } catch {
+    return false;
+  }
+})();
+
+// The counter creeps toward 90% while the portfolio loads, then races to 100
+// and the curtain lifts as soon as the data is in (after a short minimum),
+// instead of always playing a fixed-length count.
 export default function Loader({ name = 'Biswabhusan Sahoo', dataReady, onDone }) {
   const root = useRef(null);
   const count = useRef(null);
-  const [counted, setCounted] = useState(false);
+  const progress = useRef({ v: 0, tween: null, start: performance.now() });
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
-      setCounted(true);
-      return;
-    }
-    const state = { v: 0 };
+    if (prefersReducedMotion()) return;
+    const p = progress.current;
     const ctx = gsap.context(() => {
-      gsap.from('.ld-word', { yPercent: 110, duration: 0.8, ease: 'expo.out', stagger: 0.12 });
-      gsap.to(state, {
-        v: 100,
-        duration: 1.6,
-        ease: 'power3.inOut',
+      gsap.from('.ld-word', { yPercent: 110, duration: 0.7, ease: 'expo.out', stagger: 0.08 });
+      p.tween = gsap.to(p, {
+        v: 90,
+        duration: 2.4,
+        ease: 'power2.out',
         onUpdate: () => {
-          if (count.current) count.current.textContent = String(Math.round(state.v)).padStart(3, '0');
+          if (count.current) count.current.textContent = String(Math.round(p.v)).padStart(3, '0');
+          gsap.set('.ld-bar', { scaleX: p.v / 100 });
         },
-        onComplete: () => setCounted(true),
       });
-      gsap.to('.ld-bar', { scaleX: 1, duration: 1.6, ease: 'power3.inOut' });
     }, root);
     return () => ctx.revert();
   }, []);
 
   useEffect(() => {
-    if (!counted || !dataReady) return;
+    if (!dataReady) return;
     if (prefersReducedMotion()) {
       setGone(true);
       onDone();
       return;
     }
-    const tl = gsap.timeline({ onComplete: () => setGone(true) });
-    tl.to(root.current.querySelectorAll('.ld-fade'), { yPercent: -110, duration: 0.6, ease: 'expo.in', stagger: 0.04 })
-      .to(root.current, { clipPath: 'inset(0 0 100% 0)', duration: 0.9, ease: 'expo.inOut' }, '-=0.1');
-    // Hero starts its intro while the curtain lifts.
-    tl.call(onDone, null, '-=0.55');
+    const p = progress.current;
+    const elapsed = (performance.now() - p.start) / 1000;
+    const wait = Math.max(0, (REPEAT_VISIT ? MIN_REPEAT : MIN_FIRST) - elapsed);
+    p.tween?.kill();
+
+    const tl = gsap.timeline({ delay: wait, onComplete: () => setGone(true) });
+    tl.to(p, {
+      v: 100,
+      duration: 0.3,
+      ease: 'power2.out',
+      onUpdate: () => {
+        if (count.current) count.current.textContent = String(Math.round(p.v)).padStart(3, '0');
+        gsap.set(root.current.querySelector('.ld-bar'), { scaleX: p.v / 100 });
+      },
+    })
+      .to(root.current.querySelectorAll('.ld-fade'), { yPercent: -110, duration: 0.35, ease: 'power3.in', stagger: 0.03 })
+      .to(root.current, { clipPath: 'inset(0 0 100% 0)', duration: 0.6, ease: 'expo.inOut' }, '-=0.1')
+      // Hero starts its intro while the curtain lifts.
+      .call(onDone, null, '-=0.45');
     return () => tl.kill();
-  }, [counted, dataReady]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dataReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (gone) return null;
 
