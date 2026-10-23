@@ -6,7 +6,7 @@ export const profile = {
   headline:
     'Full-stack developer building production Generative & Agentic AI systems: real-time voice agents, RAG pipelines, LLM document automation, and the products around them.',
   about:
-    "I'm a full-stack developer building production Generative AI and Agentic AI systems — real-time voice agents, RAG pipelines and LLM-powered document automation. I'm full-stack too: React, Next.js and Node.js, shipping REST and WebSocket APIs, webhooks and secure web apps end to end.",
+    "I'm a full-stack developer building production Generative AI and Agentic AI systems: real-time voice agents, RAG pipelines and LLM-powered document automation. I'm full-stack too: React, Next.js and Node.js, shipping REST and WebSocket APIs, webhooks and secure web apps end to end.",
   location: 'Bhubaneswar, Odisha',
   email: 'biswabhusansahoo2005@gmail.com',
   photo: '/photo.jpg',
@@ -18,7 +18,7 @@ export const profile = {
   stats: [
     { value: 95, suffix: '%+', label: 'Extraction accuracy on unstructured documents, replacing manual data entry.' },
     { value: 99, suffix: '%', label: 'Of the internal team adopted the async microservices I architected.' },
-    { value: 2, suffix: '×', label: 'First place — a college project expo and a college hackathon.' },
+    { value: 2, suffix: '×', label: 'First place at a college project expo and a college hackathon.' },
   ],
   education: [
     { kind: 'Education', title: 'Bachelor of Computer Applications', place: 'Utkal University · Bhubaneswar, Odisha' },
@@ -39,7 +39,7 @@ export const experience = [
   {
     company: 'GlobX System & Network Pvt. Ltd.',
     role: 'Full-Stack Developer',
-    period: 'May 2026 — Present',
+    period: 'May 2026 to Present',
     location: 'Bhubaneswar, Odisha',
     current: true,
     order: 0,
@@ -47,7 +47,7 @@ export const experience = [
       { title: 'Enterprise AI voice agents', text: 'Leading development of real-time agents: a FastAPI WebSocket layer for audio streaming and a GPT-4o-mini reasoning layer orchestrated through a Model Context Protocol server for context-aware, tool-using responses.' },
       { title: 'Agentic document automation', text: 'An LLM pipeline built on LangChain, prompt engineering and structured outputs that extracts data from unstructured documents with 95%+ accuracy, replacing manual entry.' },
       { title: 'Bulk tender import', text: 'A module that migrates tenders from the legacy GBX Tracker spreadsheet into the OneTrack bid-management system, mapping each bid to its correct lifecycle stage and validating before import.' },
-      { title: 'Async microservices', text: 'Modular asynchronous services with third-party API integrations and workflow orchestration — adopted by 99% of the internal team, cutting manual operational effort.' },
+      { title: 'Async microservices', text: 'Modular asynchronous services with third-party API integrations and workflow orchestration, adopted by 99% of the internal team, cutting manual operational effort.' },
     ],
   },
 ];
@@ -93,6 +93,6 @@ export const skills = [
 ].map((s, i) => ({ ...s, order: i }));
 
 export const achievements = [
-  { rank: '1st', title: 'College Project Expo', description: 'Built AI agents for an ERP system with FastAPI, LangGraph, ChromaDB and LLM workflows — plus the frontend landing site.', order: 0 },
+  { rank: '1st', title: 'College Project Expo', description: 'Built AI agents for an ERP system with FastAPI, LangGraph, ChromaDB and LLM workflows, plus the frontend landing site.', order: 0 },
   { rank: '1st', title: 'College Hackathon', description: 'Led the backend of a code-practice platform: Monaco Editor, Piston API for code execution, FastAPI and a React frontend.', order: 1 },
 ];
