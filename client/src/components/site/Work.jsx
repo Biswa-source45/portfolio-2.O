@@ -35,7 +35,7 @@ function ProjectVisual({ project, index }) {
           key={tag}
           variants={{ rest: { x: 0, y: 0 }, hover: { x: (i % 2 ? 1 : -1) * 14, y: (i < 3 ? -1 : 1) * 12 } }}
           transition={{ type: 'spring', stiffness: 160, damping: 14 }}
-          className="absolute rounded-full border border-bg/25 bg-bg/10 px-3 py-1 font-mono text-[11px] backdrop-blur"
+          className="absolute rounded-full border border-bg/25 bg-bg/15 px-3 py-1 font-mono text-[11px]"
           style={{ left: CHIP_SPOTS[i][0], top: CHIP_SPOTS[i][1] }}
         >
           {tag}
@@ -101,16 +101,18 @@ function ProjectCard({ project, index, total }) {
   );
 }
 
-// Text, tags and links slide in one by one, then the artwork wipes open.
-function cascade(card, scrollTrigger, x, y) {
-  const tl = gsap.timeline({ scrollTrigger });
-  tl.from(card.querySelectorAll('.wc-part'), { x, y, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.06 }).fromTo(
-    card.querySelector('.wc-visual'),
-    { clipPath: 'inset(0 0 0 100% round 16px)' },
-    { clipPath: 'inset(0 0 0 0% round 16px)', duration: 1.1, ease: 'expo.inOut' },
-    0.1
-  );
-  return tl;
+// Text, tags and links rise in one by one while the artwork wipes open. Runs
+// once as the card starts to enter, so a card never slides up looking empty.
+function cascade(card, trigger) {
+  gsap
+    .timeline({ scrollTrigger: { trigger, start: 'top 95%', once: true } })
+    .from(card.querySelectorAll('.wc-part'), { y: 26, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.05 })
+    .fromTo(
+      card.querySelector('.wc-visual'),
+      { clipPath: 'inset(100% 0 0 0 round 16px)' },
+      { clipPath: 'inset(0% 0 0 0 round 16px)', duration: 0.9, ease: 'power3.inOut' },
+      0
+    );
 }
 
 // Sticky offsets: each card parks a little lower than the one before it.
@@ -124,25 +126,33 @@ export default function Work({ projects = [] }) {
     () => {
       if (prefersReducedMotion()) return;
       const slots = gsap.utils.toArray('.work-slot');
+      const last = slots.at(-1);
       const mm = gsap.matchMedia();
-      // Desktop: cards stick and stack; each one shrinks and dims as the next slides over it.
+      // Desktop: cards stick and stack. From the moment the next card enters until
+      // the last card lands, each card keeps sinking back (smaller, more faded),
+      // so the pile gets deeper as you scroll. Only transform and opacity animate.
       mm.add('(min-width: 768px)', () => {
         slots.forEach((slot, i) => {
           const card = slot.querySelector('.work-card');
-          cascade(card, { trigger: slot, start: 'top 78%' }, 0, 40);
+          cascade(card, slot);
           const next = slots[i + 1];
           if (!next) return;
-          // Only transform and opacity animate here so the scrub stays on the GPU.
           const depth = slots.length - 1 - i;
-          const stackIn = { trigger: next, start: 'top bottom', end: `top ${STACK_TOP + (i + 1) * STACK_STEP}px`, scrub: 0.4 };
-          gsap.to(card, { scale: 1 - 0.04 * depth, ease: 'none', scrollTrigger: { ...stackIn } });
-          gsap.to(card.querySelector('.wc-shade'), { opacity: 0.45, ease: 'none', scrollTrigger: { ...stackIn } });
+          const sink = {
+            trigger: next,
+            start: 'top bottom',
+            endTrigger: last,
+            end: `top ${STACK_TOP + (slots.length - 1) * STACK_STEP}px`,
+            scrub: true,
+          };
+          gsap.to(card, { scale: 1 - 0.05 * depth, force3D: true, ease: 'none', scrollTrigger: { ...sink } });
+          gsap.to(card.querySelector('.wc-shade'), { opacity: Math.min(0.6, 0.3 * depth), ease: 'none', scrollTrigger: { ...sink } });
         });
       });
       mm.add('(max-width: 767px)', () => {
         slots.forEach((slot) => {
           gsap.from(slot, { y: 70, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: slot, start: 'top 88%' } });
-          cascade(slot.querySelector('.work-card'), { trigger: slot, start: 'top 80%' }, 0, 36);
+          cascade(slot.querySelector('.work-card'), slot);
         });
       });
     },
