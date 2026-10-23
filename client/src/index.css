@@ -1,0 +1,168 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --ink: #121110;
+  --muted: #6f6b64;
+  --line: rgb(18 17 16 / 0.12);
+  --accent: #ff5b1f;
+  --accent-ink: #ffffff;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0e0d0c;
+  --surface: #171615;
+  --ink: #f1efe9;
+  --muted: #9a958c;
+  --line: rgb(241 239 233 / 0.12);
+  --accent: #ff7a3d;
+  --accent-ink: #120a05;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0e0d0c;
+    --surface: #171615;
+    --ink: #f1efe9;
+    --muted: #9a958c;
+    --line: rgb(241 239 233 / 0.12);
+    --accent: #ff7a3d;
+    --accent-ink: #120a05;
+    color-scheme: dark;
+  }
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Theme switch: the new theme is revealed through a soft-edged circle
+   growing from the toggle button (see useTheme). */
+@property --reveal {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes theme-reveal {
+  from {
+    --reveal: -10vmax;
+  }
+  to {
+    --reveal: 160vmax;
+  }
+}
+
+html[data-theme-switching]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-theme-switching]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  mask-image: radial-gradient(
+    circle at var(--reveal-x, 100%) var(--reveal-y, 0px),
+    #000 var(--reveal),
+    transparent calc(var(--reveal) + 10vmax)
+  );
+  animation: theme-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@media (pointer: fine) {
+  .has-cursor,
+  .has-cursor a,
+  .has-cursor button {
+    cursor: none;
+  }
+}
+
+@layer components {
+  /* Hidden lines/chars that GSAP slides up into view. */
+  .reveal-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .grain::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .input {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: 0.65rem 0.85rem;
+    font-size: 0.925rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

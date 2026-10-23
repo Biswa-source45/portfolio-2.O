@@ -1,3 +1,6 @@
-node_modules/
-.DS_Store
-.vercel/
+node_modules
+dist
+.env
+server/.mongo-data
+server/uploads/*
+!server/uploads/photo.jpg
