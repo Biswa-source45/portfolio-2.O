@@ -99,7 +99,7 @@ function BigName({ text }) {
   const root = useRef(null);
   const letters = [...text.toUpperCase()];
   // Sized from the letter count so any name spans the content width.
-  const em = letters.length * 0.68;
+  const em = letters.length * 0.74;
 
   useGSAP(
     () => {
@@ -123,13 +123,14 @@ function BigName({ text }) {
     <div
       ref={root}
       aria-hidden="true"
-      className="pointer-events-none mt-10 flex select-none justify-center overflow-hidden pb-4 font-display font-extrabold uppercase leading-none tracking-[-0.06em]"
+      className="pointer-events-none mt-10 flex select-none justify-center overflow-x-visible overflow-y-clip pb-4 font-display font-extrabold uppercase leading-none"
       style={{ fontSize: `min(${(92 / em).toFixed(2)}vw, ${Math.round(1216 / em)}px)` }}
     >
+      {/* Padding keeps each glyph inside its own clipped background; negative margins tighten the spacing. */}
       {letters.map((c, i) => (
         <span
           key={i}
-          className="bn-char inline-block bg-clip-text text-transparent"
+          className="bn-char -mx-[0.08em] inline-block bg-clip-text px-[0.05em] text-transparent"
           style={{
             backgroundImage:
               'linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, transparent) 15%, color-mix(in srgb, var(--ink) 8%, transparent) 60%, color-mix(in srgb, var(--ink) 3%, transparent) 85%)',
